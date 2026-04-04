@@ -1644,11 +1644,43 @@
       <p style="color: var(--text-secondary); font-weight: 300; font-size: 1.15rem;">
         Crypto education, AI updates, and behind-the-scenes from a nurse building in Web3. No spam. Unsubscribe anytime.
       </p>
-      <form class="email-signup__form" id="signupForm" onsubmit="return false;">
-        <input class="email-signup__input" type="email" placeholder="Enter your email address" required />
-        <button class="email-signup__btn" type="submit">Subscribe</button>
+      <form class="email-signup__form" id="signupForm">
+        <input class="email-signup__input" id="signupEmail" type="email" placeholder="Enter your email address" required />
+        <button class="email-signup__btn" type="submit" id="signupBtn">Subscribe</button>
       </form>
-      <div class="email-signup__note">Join the Nurse2Web3 community. Your email is never shared.</div>
+      <div class="email-signup__note" id="signupNote">Join the Nurse2Web3 community. Your email is never shared.</div>
+      <script>
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+          e.preventDefault();
+          const email = document.getElementById('signupEmail').value.trim();
+          const btn = document.getElementById('signupBtn');
+          const note = document.getElementById('signupNote');
+          if (!email) return;
+          btn.textContent = 'Subscribing...';
+          btn.disabled = true;
+          try {
+            const res = await fetch('https://cryptosafe-nine.vercel.app/api/newsletter', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email })
+            });
+            const data = await res.json();
+            if (data.success) {
+              note.textContent = "You're in! Check your inbox.";
+              note.style.color = '#00e6cc';
+              document.getElementById('signupEmail').value = '';
+            } else {
+              note.textContent = data.error || 'Something went wrong. Try again.';
+              note.style.color = '#ff5252';
+            }
+          } catch {
+            note.textContent = 'Something went wrong. Try again.';
+            note.style.color = '#ff5252';
+          }
+          btn.textContent = 'Subscribe';
+          btn.disabled = false;
+        });
+      </script>
     </div>
   </section>
 
